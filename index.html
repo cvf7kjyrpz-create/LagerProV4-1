@@ -2,9 +2,12 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Lager Pro V4.1 – Inventur & Rechnungen</title>
+  <title>Lager Pro V4.3 – Inventur & Rechnungen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#050509" />
+
+  <!-- Manifest für PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
 
   <style>
     :root{
@@ -42,10 +45,12 @@
 
     header.app-header{
       padding:0.75rem 1rem 0.6rem;
-      border-radius:14px;
-      background:linear-gradient(120deg,rgba(46,204,113,0.22),rgba(0,0,0,0.65));
+      border-radius:18px;
+      background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(0,0,0,0.8));
       box-shadow:var(--shadow-soft);
-      margin-bottom:0.7rem;
+      margin-bottom:0.8rem;
+      backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,0.08);
     }
 
     .header-top{
@@ -72,37 +77,45 @@
     }
 
     .pill{
-      padding:0.15rem 0.6rem;
+      padding:0.15rem 0.7rem;
       border-radius:999px;
-      border:1px solid rgba(245,245,247,0.25);
+      border:1px solid rgba(245,245,247,0.35);
       font-size:0.7rem;
       color:var(--text-soft);
       white-space:nowrap;
+      background:rgba(0,0,0,0.35);
     }
 
-    /* NAV */
+    /* NAV – Apple Style */
     .nav-bar{
-      margin-top:0.6rem;
-      display:flex;
-      gap:0.4rem;
+      margin-top:0.7rem;
+      display:inline-flex;
+      gap:0.1rem;
+      padding:0.12rem;
+      border-radius:999px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.12);
     }
     .nav-btn{
-      padding:0.25rem 0.9rem;
+      padding:0.25rem 0.85rem;
       border-radius:999px;
-      border:1px solid rgba(245,245,247,0.18);
-      background:rgba(0,0,0,0.25);
-      color:var(--text-soft);
-      font-size:0.78rem;
+      border:none;
+      font-size:0.8rem;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
-      gap:0.3rem;
+      gap:0.35rem;
+      white-space:nowrap;
+      background:transparent;
+      color:var(--text-soft);
+      transition:background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
     }
     .nav-btn.active{
       background:#f5f5f7;
       color:#050509;
+      box-shadow:0 4px 14px rgba(0,0,0,0.45);
       font-weight:600;
-      border-color:#f5f5f7;
+      transform:translateY(-1px);
     }
 
     /* Statistik Lager */
@@ -151,7 +164,7 @@
       font-size:0.8rem;
     }
 
-    /* TOOLBAR */
+    /* TOOLBAR – Buttons Apple-ish */
     .toolbar{
       margin-top:0.9rem;
       display:flex;
@@ -171,25 +184,25 @@
 
     button{
       cursor:pointer;
-      padding:0.32rem 0.85rem;
+      padding:0.32rem 0.9rem;
       border-radius:999px;
-      border:1px solid var(--border);
-      background:var(--bg-elevated-soft);
-      color:var(--text);
+      border:1px solid rgba(255,255,255,0.12);
+      background:rgba(255,255,255,0.06);
+      color:var(--text-soft);
       font-size:0.8rem;
       display:inline-flex;
       align-items:center;
       gap:0.3rem;
       white-space:nowrap;
-      transition:background 0.15s ease,transform 0.1s ease,box-shadow 0.15s ease,border-color 0.15s ease;
+      transition:background 0.16s ease,transform 0.08s ease,box-shadow 0.15s ease,border-color 0.15s ease,color 0.15s ease;
     }
 
     button.primary{
-      background:var(--accent);
-      border-color:var(--accent);
-      color:#03130a;
+      background:#f5f5f7;
+      border-color:#f5f5f7;
+      color:#050509;
       font-weight:600;
-      box-shadow:0 4px 18px rgba(46,204,113,0.35);
+      box-shadow:0 4px 16px rgba(0,0,0,0.55);
     }
     button.primary:active{
       transform:scale(0.97);
@@ -203,17 +216,17 @@
     }
 
     button:disabled{
-      opacity:0.4;
+      opacity:0.45;
       cursor:default;
       box-shadow:none;
       transform:none;
     }
 
     label.btn-like{
-      padding:0.32rem 0.85rem;
+      padding:0.32rem 0.9rem;
       border-radius:999px;
-      border:1px dashed var(--border);
-      background:transparent;
+      border:1px dashed rgba(255,255,255,0.3);
+      background:rgba(255,255,255,0.02);
       font-size:0.8rem;
       display:inline-flex;
       align-items:center;
@@ -238,14 +251,6 @@
     }
     input::placeholder{color:var(--muted);}
 
-    select{
-      padding-right:1.4rem;
-      background-image:linear-gradient(45deg,transparent 50%, var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
-      background-position:calc(100% - 12px) calc(50% - 3px),calc(100% - 8px) calc(50% - 3px);
-      background-size:4px 4px,4px 4px;
-      background-repeat:no-repeat;
-    }
-
     textarea{
       padding:0.35rem 0.4rem;
       border-radius:8px;
@@ -259,7 +264,7 @@
     /* TABLE CARD */
     .table-card{
       margin-top:0.8rem;
-      border-radius:14px;
+      border-radius:18px;
       border:1px solid var(--border);
       background:radial-gradient(circle at top left,rgba(46,204,113,0.04),transparent 56%);
       overflow:hidden;
@@ -354,10 +359,10 @@
       background:#10121c;
       border:1px solid var(--border);
       color:var(--text);
-      border-radius:14px;
+      border-radius:16px;
       padding:1rem 0.95rem 0.9rem;
       width:95%;
-      max-width:460px;
+      max-width:480px;
       box-shadow:0 24px 70px rgba(0,0,0,0.85);
     }
     dialog::backdrop{
@@ -427,7 +432,7 @@
     <header class="app-header">
       <div class="header-top">
         <div class="app-title">
-          <h1>Lager Pro V4.1</h1>
+          <h1>Lager Pro V4.3</h1>
           <span>Inventur & Rechnungen – lokal auf deinem Gerät</span>
         </div>
         <div class="pill">Kleinunternehmer · kein MwSt-Ausweis</div>
@@ -496,7 +501,7 @@
     <!-- ===== RECHNUNGEN ===== -->
     <section id="view-rechnungen" style="display:none;">
       <div id="invoiceStats">
-        <div class="invoice-chip">Umsatz gesamt: <b id="invoiceTotalRevenue">0,00 €</b></div>
+        <div class="invoice-chip">Rechnung gesamt: <b id="invoiceTotalRevenue">0,00 €</b></div>
         <div class="invoice-chip">Gewinn / Verlust: <b id="invoiceTotalProfit">0,00 €</b></div>
       </div>
 
@@ -505,7 +510,7 @@
           <button id="btnCompany">Firmendaten</button>
         </div>
         <div class="toolbar-right">
-          <input id="invoiceSearch" type="search" placeholder="Suche nach Rechnungsnr., Name, Artikel, Plattform …">
+          <input id="invoiceSearch" type="search" placeholder="Suche nach Rechnungsnr., Kunde, Artikel, Plattform …">
         </div>
       </div>
 
@@ -518,7 +523,7 @@
                 <th>Datum</th>
                 <th>Kunde</th>
                 <th>Artikel</th>
-                <th>Verkauf (€)</th>
+                <th>Rechnung (€)</th>
                 <th>Gewinn/Verlust (€)</th>
                 <th>Plattform</th>
                 <th>Zahlung</th>
@@ -618,20 +623,13 @@
     <h3 class="dialog-title">Rechnung erstellen</h3>
     <form id="invoiceForm" class="form-grid" onsubmit="return false;">
       <label class="full-width">
-        Käufer Name
-        <input id="invBuyerName">
+        Empfänger (Name + Adresse, mehrzeilig)
+        <textarea id="invBuyerBlock" rows="4" placeholder="Name&#10;Straße Hausnummer&#10;PLZ Ort&#10;Land (optional)"></textarea>
       </label>
-      <label class="full-width">
-        Käufer Adresse (Straße, Nr.)
-        <input id="invBuyerAddress">
-      </label>
+
       <label>
-        PLZ / Ort
-        <input id="invBuyerCity">
-      </label>
-      <label>
-        Plattform (z.B. Vinted, eBay)
-        <input id="invPlatform">
+        Plattform
+        <input id="invPlatform" placeholder="z.B. Vinted, eBay">
       </label>
       <label>
         Zahlungsart
@@ -641,9 +639,13 @@
         Verkaufsdatum
         <input id="invSaleDate" type="date">
       </label>
+      <label>
+        Versandkosten (€)
+        <input id="invShipping" type="number" step="0.01" min="0">
+      </label>
 
       <label class="full-width">
-        Positionen (Artikel / Menge / Verkauf €)
+        Positionen (Artikel / Menge / Stückpreis)
       </label>
       <div id="invoicePositions" class="full-width"></div>
       <button type="button" id="btnAddPosition">+ Position hinzufügen</button>
@@ -661,7 +663,7 @@
     <form id="companyForm" class="form-grid" onsubmit="return false;">
       <label class="full-width">
         Firmenname / dein Name
-        <input id="companyName">
+        <input id="companyName" placeholder="z.B. OneByOneFashion">
       </label>
       <label class="full-width">
         Straße / Nr.
@@ -669,11 +671,11 @@
       </label>
       <label>
         PLZ / Ort
-        <input id="companyCity">
+        <input id="companyCity" placeholder="98683 Ilmenau">
       </label>
       <label>
         E-Mail
-        <input id="companyEmail">
+        <input id="companyEmail" placeholder="OneByOneFashion@myyahoo.com">
       </label>
       <label>
         Telefon
@@ -681,12 +683,12 @@
       </label>
       <label class="full-width">
         Umsatzsteuer-ID (optional)
-        <input id="companyVatId">
+        <input id="companyVatId" placeholder="DE359019064">
       </label>
       <label class="full-width">
-        Fußtext auf Rechnung
+        Fußtext auf Rechnung (optional)
         <textarea id="companyFooter" rows="4"
-          placeholder="Dein eigener Text …"></textarea>
+          placeholder="Eigener Text, z.B. Bankdaten, Signatur …"></textarea>
       </label>
       <div class="dialog-menu full-width">
         <button type="button" id="btnCancelCompany">Abbrechen</button>
@@ -1040,9 +1042,7 @@
             const loaded = JSON.parse(raw);
             company = { ...company, ...loaded };
           }
-        } catch {
-          // fallback: defaults bleiben
-        }
+        } catch {}
       }
       function openCompanyDialog() {
         setValue("companyName", company.name || "");
@@ -1246,7 +1246,7 @@
         invoiceDialog.showModal();
       }
 
-      /* Position hinzufügen */
+      /* Position hinzufügen (mit Stückpreis & Gesamt) */
       function addInvoicePositionRow(preItem) {
         const row = document.createElement("div");
         row.className = "inv-pos-row";
@@ -1268,12 +1268,13 @@
         qtyInput.type = "number";
         qtyInput.min = "1";
         qtyInput.value = "1";
+        qtyInput.placeholder = "Menge";
 
         const priceInput = document.createElement("input");
         priceInput.type = "number";
         priceInput.min = "0";
         priceInput.step = "0.01";
-        priceInput.placeholder = "Verkauf €";
+        priceInput.placeholder = "Stückpreis €";
 
         const removeBtn = document.createElement("button");
         removeBtn.type = "button";
@@ -1294,14 +1295,13 @@
         }
       }
 
-      /* Rechnung speichern */
+      /* Rechnung speichern – Menge × Stückpreis + Versand */
       function saveInvoice() {
-        const buyerName = getValue("invBuyerName").trim();
+        const buyerBlock = getValue("invBuyerBlock").trim();
         const saleDate = getValue("invSaleDate") || new Date().toISOString().slice(0,10);
-        const buyerAddress = getValue("invBuyerAddress").trim();
-        const buyerCity = getValue("invBuyerCity").trim();
         const platform = getValue("invPlatform").trim();
         const paymentMethod = getValue("invPaymentMethod").trim();
+        const shippingCost = Number(getValue("invShipping") || 0);
 
         const posRows = Array.from(invoicePositions.querySelectorAll(".inv-pos-row"));
         if (!posRows.length) {
@@ -1310,7 +1310,7 @@
         }
 
         const positions = [];
-        let totalRevenue = 0;
+        let articleTotal = 0;
         let totalCost = 0;
 
         for (const row of posRows) {
@@ -1326,30 +1326,33 @@
           if (!it) continue;
 
           const qty = Math.max(1, Number(qtyInput.value || 1));
-          const salePrice = Number(priceInput.value || 0);
-          if (salePrice <= 0) continue;
+          const unitSalePrice = Number(priceInput.value || 0);
+          if (unitSalePrice <= 0) continue;
 
           const purchasePrice = Number(it.price || 0);
-          const costLine = purchasePrice * qty;
-          const revLine = salePrice;
+          const lineCost = purchasePrice * qty;
+          const lineRevenue = unitSalePrice * qty;
 
-          totalRevenue += revLine;
-          totalCost += costLine;
+          articleTotal += lineRevenue;
+          totalCost += lineCost;
 
           positions.push({
             articleId,
             articleName: it.name || "",
             articleNumber: it.articleNumber || "",
             quantity: qty,
-            salePrice: revLine,
+            unitSalePrice,
+            lineTotal: lineRevenue,
             unitPurchasePrice: purchasePrice
           });
         }
 
         if (!positions.length) {
-          alert("Keine gültige Position mit Artikel und Preis.");
+          alert("Keine gültige Position mit Artikel und Stückpreis.");
           return;
         }
+
+        const totalRevenue = articleTotal + (shippingCost > 0 ? shippingCost : 0);
 
         let counter = 0;
         try {
@@ -1359,7 +1362,8 @@
         localStorage.setItem(INVOICE_COUNTER_KEY, String(counter));
 
         const year = new Date(saleDate).getFullYear() || new Date().getFullYear();
-        const numberFormatted = "RE-" + year + "-" + String(counter).padStart(3,"0");
+        const yearStr = String(year);
+        const numberFormatted = yearStr + "-" + String(counter).padStart(3,"0"); // z.B. 2025-001
         const profit = totalRevenue - totalCost;
 
         const invoice = {
@@ -1368,11 +1372,10 @@
           numberFormatted,
           saleDate,
           createdAt: new Date().toISOString(),
-          buyerName,
-          buyerAddress,
-          buyerCity,
+          buyerBlock,
           platform,
           paymentMethod,
+          shippingCost: shippingCost > 0 ? shippingCost : 0,
           positions,
           totalRevenue,
           totalCost,
@@ -1410,12 +1413,12 @@
           .sort((a,b) => (b.number || 0) - (a.number || 0))
           .filter(inv => {
             if (!search) return true;
+            const firstLine = (inv.buyerBlock || "").split(/\r?\n/)[0] || "";
             const articleNames = (inv.positions || []).map(p => p.articleName || "").join(" ");
             const hay = `
               ${inv.numberFormatted || ""}
               ${inv.saleDate || ""}
-              ${inv.buyerName || ""}
-              ${inv.buyerCity || ""}
+              ${firstLine}
               ${articleNames}
               ${inv.platform || ""}
               ${inv.paymentMethod || ""}
@@ -1435,11 +1438,12 @@
           const articleNames = (inv.positions || []).map(p => p.articleName || "").join(", ");
           const revenue = Number(inv.totalRevenue || 0);
           const profit = Number(inv.profit || 0);
+          const firstLine = (inv.buyerBlock || "").split(/\r?\n/)[0] || "";
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${escapeHtml(inv.numberFormatted || String(inv.number || ""))}</td>
             <td>${escapeHtml(inv.saleDate || "")}</td>
-            <td>${escapeHtml(inv.buyerName || "")}</td>
+            <td>${escapeHtml(firstLine || "")}</td>
             <td>${escapeHtml(articleNames || "")}</td>
             <td>${revenue.toFixed(2).replace(".", ",")}</td>
             <td>${profit.toFixed(2).replace(".", ",")}</td>
@@ -1466,115 +1470,165 @@
         invoiceTotalProfitEl.textContent = totalProfit.toFixed(2).replace(".", ",") + " €";
       }
 
-      /* Rechnungsvorschau / Druck mit deinem Layout */
+      /* Rechnungsvorschau / Druck – mit Zwischensumme / Versand / Rechnung gesamt (Variante A) */
       function openInvoicePreview(inv, autoPrint) {
         const win = window.open("", "_blank");
         if (!win) return;
 
-        const totalRevenue = Number(inv.totalRevenue || 0);
-        const profit = Number(inv.profit || 0);
+        const articleTotal = (inv.positions || []).reduce(
+          (sum, p) => sum + Number(p.lineTotal || 0),
+          0
+        );
+        const shippingCost = Number(inv.shippingCost || 0);
+        const totalRevenue = articleTotal + (shippingCost > 0 ? shippingCost : 0);
 
         const sellerName = company.name || "OneByOneFashion";
         const sellerCity = company.city || "98683 Ilmenau";
         const sellerEmail = company.email || "OneByOneFashion@myyahoo.com";
         const vatId = company.vatId || "DE359019064";
 
-        const headerLine =
-          sellerName +
-          (sellerCity ? " – " + sellerCity : "") +
-          (vatId ? " – USt-ID: " + vatId : "") +
-          (sellerEmail ? " – E-Mail: " + sellerEmail : "");
-
         const defaultFooter =
           "Der Rechnungsbetrag wurde bereits über das System von Vinted beglichen.\n" +
-          "Es liegt aufgrund des Kleinunternehmerstatus nach § 19 UStG eine Umsatzsteuerbefreiung vor Das Rechnungsdatum entspricht dem Lieferdatum.\n" +
-          "Wir bedanken uns für den Auftrag und die angenehme Zusammenarbeit.";
+          "Es liegt aufgrund des Kleinunternehmerstatus nach § 19 UStG eine Umsatzsteuerbefreiung vor. Das Rechnungsdatum entspricht dem Lieferdatum.\n" +
+          "Wir bedanken uns für den Auftrag und die angenehme Zusammenarbeit.\n\n" +
+          sellerName + "\n" +
+          (sellerCity ? sellerCity + "\n" : "") +
+          (vatId ? "USt-ID: " + vatId + "\n" : "") +
+          (sellerEmail ? "E-Mail: " + sellerEmail + "\n" : "");
 
-        const footerText = (company.footer && company.footer.trim().length)
-          ? company.footer
-          : defaultFooter;
+        const footerText =
+          company.footer && company.footer.trim().length
+            ? company.footer + "\n\n" + defaultFooter
+            : defaultFooter;
 
-        const posRows = (inv.positions || []).map(p => {
-          const costLine = Number(p.unitPurchasePrice || 0) * Number(p.quantity || 0);
-          const profitLine = Number(p.salePrice || 0) - costLine;
-          return `
-            <tr>
-              <td>${escapeHtml(p.articleName || "")}</td>
-              <td>${escapeHtml(p.articleNumber || "")}</td>
-              <td style="text-align:right;">${p.quantity || 0}</td>
-              <td style="text-align:right;">${Number(p.salePrice || 0).toFixed(2).replace(".", ",")}</td>
-              <td style="text-align:right;">${costLine.toFixed(2).replace(".", ",")}</td>
-              <td style="text-align:right;">${profitLine.toFixed(2).replace(".", ",")}</td>
-            </tr>
-          `;
-        }).join("");
+        const posRows = (inv.positions || [])
+          .map((p) => {
+            const qty = Number(p.quantity || 0);
+            const unitSalePrice = Number(p.unitSalePrice || 0);
+            const lineTotal = Number(p.lineTotal || (qty * unitSalePrice));
+            return `
+              <tr>
+                <td>${escapeHtml(p.articleName || "")}</td>
+                <td>${escapeHtml(p.articleNumber || "")}</td>
+                <td style="text-align:right;">${qty}</td>
+                <td style="text-align:right;">${unitSalePrice
+                  .toFixed(2)
+                  .replace(".", ",")}</td>
+                <td style="text-align:right;">${lineTotal
+                  .toFixed(2)
+                  .replace(".", ",")}</td>
+              </tr>
+            `;
+          })
+          .join("");
 
         const createdDate = new Date(inv.createdAt || inv.saleDate || "");
         const createdStr = isNaN(createdDate.getTime())
           ? ""
           : createdDate.toLocaleDateString("de-DE");
 
+        const buyerBlockHtml = nl2br(inv.buyerBlock || "");
+
         win.document.write(`
           <html>
             <head>
               <meta charset="UTF-8">
-              <title>Rechnung ${inv.numberFormatted || ""}</title>
+              <title>Rechnung ${inv.numberFormatted}</title>
               <style>
-                body{
-                  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-                  font-size:10pt;
-                  padding:15mm;
-                  background:#ffffff;
-                  color:#000000;
+                body {
+                  font-family: system-ui, sans-serif;
+                  font-size: 11pt;
+                  padding: 20mm;
+                  background: #fff;
+                  color: #000;
                 }
-                .header-line{
-                  text-align:right;
-                  font-size:8pt;
-                  border-bottom:1px solid #000;
-                  padding-bottom:2mm;
-                  margin-bottom:6mm;
+                .top-cols {
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 10mm;
                 }
-                .top-cols{
-                  display:flex;
-                  justify-content:space-between;
-                  gap:10mm;
-                  margin-bottom:6mm;
+                .col-left, .col-right {
+                  width: 48%;
                 }
-                .col-left,.col-right{
-                  width:50%;
+                .col-right small {
+                  display:block;
                   font-size:9pt;
+                  line-height:1.3;
                 }
-                h1{
-                  font-size:18pt;
-                  margin:0 0 4mm 0;
-                  letter-spacing:0.08em;
+                h1 {
+                  font-size: 20pt;
+                  margin: 0 0 8mm 0;
+                  padding-top: 4mm;
+                  border-top: 1px solid #000;
+                  letter-spacing: 0.04em;
                 }
-                table{width:100%;border-collapse:collapse;margin-top:4mm;}
-                th,td{
-                  border:1px solid #000;
-                  padding:2px 4px;
-                  font-size:9pt;
-                  vertical-align:top;
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                  margin-top: 4mm;
+                  font-size: 10pt;
                 }
-                th{background:#eeeeee;}
-                .small{font-size:8pt;color:#333;white-space:pre-wrap;}
+                th, td {
+                  border: 1px solid #000;
+                  padding: 4px 6px;
+                }
+                th {
+                  background: #f0f0f0;
+                }
+                .sum-box {
+                  margin-top: 10mm;
+                  display: flex;
+                  justify-content: flex-end;
+                }
+                .sum-box table {
+                  width: auto;
+                  font-size: 10pt;
+                }
+                .sum-box td {
+                  border: none;
+                  padding: 2px 6px;
+                }
+                .sum-box tr.total td {
+                  font-weight: bold;
+                  padding-top: 4px;
+                }
+                .footer {
+                  font-size: 9pt;
+                  white-space: pre-wrap;
+                  margin-top: 14mm;
+                  border-top: 1px solid #000;
+                  padding-top: 5mm;
+                }
               </style>
             </head>
-            <body>
-              <div class="header-line">${escapeHtml(headerLine)}</div>
 
+            <body>
               <div class="top-cols">
                 <div class="col-left">
-                  <div><b>Rechnung an</b></div>
-                  <div>${escapeHtml(inv.buyerName || "")}</div>
-                  <div>${escapeHtml(inv.buyerAddress || "")}</div>
-                  <div>${escapeHtml(inv.buyerCity || "")}</div>
+                  <b>Rechnung an</b><br>
+                  ${buyerBlockHtml}
                 </div>
                 <div class="col-right" style="text-align:right;">
-                  <div><b>${escapeHtml(sellerName)}</b></div>
-                  <div>Rechnungsnummer: ${escapeHtml(inv.numberFormatted || String(inv.number || ""))}</div>
-                  <div>Rechnungsdatum: ${createdStr}</div>
-                  <div>Verkaufsdatum: ${escapeHtml(inv.saleDate || "")}</div>
+                  <small>${escapeHtml(sellerName)}</small>
+                  ${
+                    sellerCity
+                      ? `<small>${escapeHtml(sellerCity)}</small>`
+                      : ""
+                  }
+                  ${
+                    vatId
+                      ? `<small>USt-ID: ${escapeHtml(vatId)}</small>`
+                      : ""
+                  }
+                  ${
+                    sellerEmail
+                      ? `<small>${escapeHtml(sellerEmail)}</small>`
+                      : ""
+                  }
+                  <br>
+                  <small>Rechnungsnummer: ${escapeHtml(inv.numberFormatted || "")}</small>
+                  <small>Rechnungsdatum: ${createdStr}</small>
+                  <small>Verkaufsdatum: ${escapeHtml(inv.saleDate || "")}</small>
                 </div>
               </div>
 
@@ -1586,9 +1640,8 @@
                     <th>Artikel</th>
                     <th>Art.-Nr.</th>
                     <th>Menge</th>
-                    <th>Verkauf (€)</th>
-                    <th>Einkaufskosten (€)</th>
-                    <th>Gewinn/Verlust (€)</th>
+                    <th>Stückpreis (€)</th>
+                    <th>Gesamt (€)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1596,12 +1649,34 @@
                 </tbody>
               </table>
 
-              <div style="margin-top:5mm;font-size:9pt;">
-                <b>Umsatz gesamt:</b> ${totalRevenue.toFixed(2).replace(".", ",")} €<br>
-                <b>Gewinn/Verlust:</b> ${profit.toFixed(2).replace(".", ",")} €
+              <div class="sum-box">
+                <table>
+                  <tr>
+                    <td>Zwischensumme Artikel:</td>
+                    <td style="text-align:right;">${articleTotal
+                      .toFixed(2)
+                      .replace(".", ",")} €</td>
+                  </tr>
+                  ${
+                    shippingCost > 0
+                      ? `<tr>
+                           <td>Versandkosten:</td>
+                           <td style="text-align:right;">${shippingCost
+                             .toFixed(2)
+                             .replace(".", ",")} €</td>
+                         </tr>`
+                      : ""
+                  }
+                  <tr class="total">
+                    <td>Rechnung gesamt:</td>
+                    <td style="text-align:right;">${totalRevenue
+                      .toFixed(2)
+                      .replace(".", ",")} €</td>
+                  </tr>
+                </table>
               </div>
 
-              <div style="margin-top:6mm;" class="small">
+              <div class="footer">
                 ${escapeHtml(footerText)}
               </div>
 
@@ -1609,6 +1684,7 @@
             </body>
           </html>
         `);
+
         win.document.close();
       }
 
@@ -1643,6 +1719,14 @@
           .replace(/&/g,"&amp;")
           .replace(/</g,"&lt;")
           .replace(/>/g,"&gt;");
+      }
+      function nl2br(str){
+        return escapeHtml(str).replace(/\r?\n/g,"<br>");
+      }
+
+      /* Service Worker für Offline */
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").catch(console.error);
       }
     });
   </script>
