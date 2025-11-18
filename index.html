@@ -704,7 +704,15 @@
 
       let items = [];
       let invoices = [];
-      let company = {};
+      let company = {
+        name: "OneByOneFashion",
+        address: "",
+        city: "98683 Ilmenau",
+        email: "OneByOneFashion@myyahoo.com",
+        phone: "",
+        vatId: "DE359019064",
+        footer: ""
+      };
       let currentItemId = null;
       let tempPhotoDataUrl = null;
 
@@ -1028,9 +1036,12 @@
       function loadCompany() {
         try {
           const raw = localStorage.getItem(COMPANY_STORAGE_KEY);
-          company = raw ? JSON.parse(raw) : {};
+          if (raw) {
+            const loaded = JSON.parse(raw);
+            company = { ...company, ...loaded };
+          }
         } catch {
-          company = {};
+          // fallback: defaults bleiben
         }
       }
       function openCompanyDialog() {
@@ -1053,8 +1064,8 @@
           vatId: getValue("companyVatId").trim(),
           footer: getValue("companyFooter").trim()
         };
-        company = obj;
-        localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(obj));
+        company = { ...company, ...obj };
+        localStorage.setItem(COMPANY_STORAGE_KEY, JSON.stringify(company));
         companyDialog.close();
       }
 
@@ -1455,21 +1466,24 @@
         invoiceTotalProfitEl.textContent = totalProfit.toFixed(2).replace(".", ",") + " €";
       }
 
-      /* Rechnungsvorschau / Druck mit deinem Text */
+      /* Rechnungsvorschau / Druck mit deinem Layout */
       function openInvoicePreview(inv, autoPrint) {
         const win = window.open("", "_blank");
         if (!win) return;
 
         const totalRevenue = Number(inv.totalRevenue || 0);
-        const totalCost = Number(inv.totalCost || 0);
         const profit = Number(inv.profit || 0);
 
-        const sellerName = company.name || "Dein Name / Unternehmen";
-        const sellerAddress = company.address || "Deine Adresse";
-        const sellerCity = company.city || "Deine Stadt";
-        const sellerEmail = company.email || "";
-        const sellerPhone = company.phone || "";
-        const vatId = company.vatId || "";
+        const sellerName = company.name || "OneByOneFashion";
+        const sellerCity = company.city || "98683 Ilmenau";
+        const sellerEmail = company.email || "OneByOneFashion@myyahoo.com";
+        const vatId = company.vatId || "DE359019064";
+
+        const headerLine =
+          sellerName +
+          (sellerCity ? " – " + sellerCity : "") +
+          (vatId ? " – USt-ID: " + vatId : "") +
+          (sellerEmail ? " – E-Mail: " + sellerEmail : "");
 
         const defaultFooter =
           "Der Rechnungsbetrag wurde bereits über das System von Vinted beglichen.\n" +
@@ -1495,6 +1509,11 @@
           `;
         }).join("");
 
+        const createdDate = new Date(inv.createdAt || inv.saleDate || "");
+        const createdStr = isNaN(createdDate.getTime())
+          ? ""
+          : createdDate.toLocaleDateString("de-DE");
+
         win.document.write(`
           <html>
             <head>
@@ -1502,16 +1521,35 @@
               <title>Rechnung ${inv.numberFormatted || ""}</title>
               <style>
                 body{
-                  font-family:system-ui,sans-serif;
+                  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
                   font-size:10pt;
                   padding:15mm;
                   background:#ffffff;
                   color:#000000;
                 }
-                h1{font-size:16pt;margin-bottom:2mm;}
-                h2{font-size:12pt;margin-bottom:2mm;}
-                .block{margin-bottom:6mm;}
-                table{width:100%;border-collapse:collapse;margin-top:3mm;}
+                .header-line{
+                  text-align:right;
+                  font-size:8pt;
+                  border-bottom:1px solid #000;
+                  padding-bottom:2mm;
+                  margin-bottom:6mm;
+                }
+                .top-cols{
+                  display:flex;
+                  justify-content:space-between;
+                  gap:10mm;
+                  margin-bottom:6mm;
+                }
+                .col-left,.col-right{
+                  width:50%;
+                  font-size:9pt;
+                }
+                h1{
+                  font-size:18pt;
+                  margin:0 0 4mm 0;
+                  letter-spacing:0.08em;
+                }
+                table{width:100%;border-collapse:collapse;margin-top:4mm;}
                 th,td{
                   border:1px solid #000;
                   padding:2px 4px;
@@ -1523,56 +1561,48 @@
               </style>
             </head>
             <body>
-              <h1>Rechnung</h1>
-              <div class="block small">
-                <div><b>Rechnungsnummer:</b> ${inv.numberFormatted || ""}</div>
-                <div><b>Rechnungsdatum:</b> ${new Date(inv.createdAt || inv.saleDate || "").toLocaleDateString("de-DE")}</div>
-                <div><b>Verkaufsdatum:</b> ${inv.saleDate || ""}</div>
+              <div class="header-line">${escapeHtml(headerLine)}</div>
+
+              <div class="top-cols">
+                <div class="col-left">
+                  <div><b>Rechnung an</b></div>
+                  <div>${escapeHtml(inv.buyerName || "")}</div>
+                  <div>${escapeHtml(inv.buyerAddress || "")}</div>
+                  <div>${escapeHtml(inv.buyerCity || "")}</div>
+                </div>
+                <div class="col-right" style="text-align:right;">
+                  <div><b>${escapeHtml(sellerName)}</b></div>
+                  <div>Rechnungsnummer: ${escapeHtml(inv.numberFormatted || String(inv.number || ""))}</div>
+                  <div>Rechnungsdatum: ${createdStr}</div>
+                  <div>Verkaufsdatum: ${escapeHtml(inv.saleDate || "")}</div>
+                </div>
               </div>
 
-              <div class="block small">
-                <h2>Verkäufer (Kleinunternehmer)</h2>
-                <div>${escapeHtml(sellerName)}</div>
-                <div>${escapeHtml(sellerAddress)}</div>
-                <div>${escapeHtml(sellerCity)}</div>
-                ${sellerEmail ? `<div>E-Mail: ${escapeHtml(sellerEmail)}</div>` : ""}
-                ${sellerPhone ? `<div>Telefon: ${escapeHtml(sellerPhone)}</div>` : ""}
-                ${vatId ? `<div>USt-ID: ${escapeHtml(vatId)}</div>` : ""}
-              </div>
+              <h1>RECHNUNG</h1>
 
-              <div class="block small">
-                <h2>Rechnung an</h2>
-                <div>${escapeHtml(inv.buyerName || "")}</div>
-                <div>${escapeHtml(inv.buyerAddress || "")}</div>
-                <div>${escapeHtml(inv.buyerCity || "")}</div>
-              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Artikel</th>
+                    <th>Art.-Nr.</th>
+                    <th>Menge</th>
+                    <th>Verkauf (€)</th>
+                    <th>Einkaufskosten (€)</th>
+                    <th>Gewinn/Verlust (€)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${posRows}
+                </tbody>
+              </table>
 
-              <div class="block small">
-                <h2>Positionen</h2>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Artikel</th>
-                      <th>Art.-Nr.</th>
-                      <th>Menge</th>
-                      <th>Verkauf (€)</th>
-                      <th>Einkaufskosten (€)</th>
-                      <th>Gewinn/Verlust (€)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${posRows}
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="block small">
+              <div style="margin-top:5mm;font-size:9pt;">
                 <b>Umsatz gesamt:</b> ${totalRevenue.toFixed(2).replace(".", ",")} €<br>
                 <b>Gewinn/Verlust:</b> ${profit.toFixed(2).replace(".", ",")} €
               </div>
 
-              <div class="block small">
-                <p class="small">${escapeHtml(footerText)}</p>
+              <div style="margin-top:6mm;" class="small">
+                ${escapeHtml(footerText)}
               </div>
 
               ${autoPrint ? "<script>window.print();<\/script>" : ""}
